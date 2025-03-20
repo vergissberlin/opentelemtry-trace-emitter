@@ -40,6 +40,14 @@ const traceNames = [
     'system-monitoring'
 ]
 
+const randomAttributes = [
+    {key: 'user.id', value: () => `user-${Math.floor(Math.random() * 1000)}`},
+    {key: 'http.status_code', value: () => [200, 201, 400, 401, 403, 500][Math.floor(Math.random() * 6)]},
+    {key: 'db.statement', value: () => ['SELECT * FROM users', 'UPDATE orders SET status="shipped"', 'DELETE FROM sessions'][Math.floor(Math.random() * 3)]},
+    {key: 'cache.hit', value: () => Math.random() > 0.5},
+    {key: 'processing.time_ms', value: () => Math.floor(Math.random() * 500)}
+]
+
 function generateRandomTrace() {
     const randomTraceName = traceNames[Math.floor(Math.random() * traceNames.length)]
     const randomProcessName = processNames[Math.floor(Math.random() * processNames.length)]
@@ -47,7 +55,14 @@ function generateRandomTrace() {
     const rootSpan = tracer.startSpan(randomTraceName)
     context.with(trace.setSpan(context.active(), rootSpan), () => {
         const span = tracer.startSpan(randomProcessName)
-        span.setAttribute('random-value', Math.random())
+
+        // Zufällige Attribute hinzufügen
+        randomAttributes.forEach(attr => {
+            if (Math.random() > 0.5) { // Nur einige zufällig auswählen
+                span.setAttribute(attr.key, attr.value())
+            }
+        })
+
         console.log(`Trace: ${randomTraceName} | Span: ${randomProcessName} | Trace ID: ${rootSpan.spanContext().traceId}`)
         span.setStatus({code: SpanStatusCode.OK})
         span.end()
