@@ -10,4 +10,4 @@ COPY . .
 ENV OTEL_COLLECTOR_URL=http://localhost:4318/v1/traces
 ENV TRACE_INTERVAL=5000
 
-CMD ["node", "tracer.js"]
+CMD ["node", "tracer.mjs"]
