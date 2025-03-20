@@ -56,9 +56,8 @@ function generateRandomTrace() {
     context.with(trace.setSpan(context.active(), rootSpan), () => {
         const span = tracer.startSpan(randomProcessName)
 
-        // Zufällige Attribute hinzufügen
         randomAttributes.forEach(attr => {
-            if (Math.random() > 0.5) { // Nur einige zufällig auswählen
+            if (Math.random() > 0.5) {
                 span.setAttribute(attr.key, attr.value())
             }
         })
