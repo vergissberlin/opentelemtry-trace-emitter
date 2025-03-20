@@ -4,26 +4,27 @@ If you want to test your OpenTelemtry configuration with a random span emitter.
 
 ## Usage
 
+### 1. Pull the image
+
 ```bash
 docker pull ghcr.io/vergissberlin/opentelemetry-trace-emitter:latest
 ```
 
-```shell
-docker manifest inspect ghcr.io/vergissberlin/opentelemetry-trace-emitter:latest
-```
+### 2. Run the image
 
 ```bash
 docker run -it --rm \
-  -e OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317 \
-  -e OTEL_RESOURCE_ATTRIBUTES=service.name=example-service \
-  ghcr.io/vergissberlin/opentelemetry-trace-emitter
+    -e OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317 \
+    ghcr.io/vergissberlin/opentelemetry-trace-emitter
 ```
 
 ## Environment Variables
 
-* `OTEL_EXPORTER_OTLP_ENDPOINT`: The endpoint to send the spans to. Default is `http://localhost:4317`.
-* `OTEL_RESOURCE_ATTRIBUTES`: The resource attributes to add to the spans. Default is `service.name=example-service`.
-* `OTEL_TRACES_EXPORTER`: The exporter to use. Default is `otlp`.
-* `OTEL_TRACES_EXPORTER_OTLP_ENDPOINT`: The endpoint to send the spans to. Default is `http://localhost:4317
-* `OTEL_TRACES_EXPORTER_OTLP_INSECURE`: Whether to use insecure connection. Default is `false`.
-* `OTEL_TRACES_EXPORTER_OTLP_HEADERS`: The headers to send with the spans. Default is `""`.
+|         Environment Variable         |                 Description                  |            Default             |
+| ------------------------------------ | -------------------------------------------- | ------------------------------ |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | The endpoint to send the spans to.           | `http://localhost:4317` |
+| `OTEL_RESOURCE_ATTRIBUTES` | The resource attributes to add to the spans. | `service.name=example-service` |
+| `OTEL_TRACES_EXPORTER` | The exporter to use.                         | `otlp` |
+| `OTEL_TRACES_EXPORTER_OTLP_ENDPOINT` | The endpoint to send the spans to.           | `http://localhost:4317` |
+| `OTEL_TRACES_EXPORTER_OTLP_INSECURE` | Whether to use insecure connection.          | `false` |
+| `OTEL_TRACES_EXPORTER_OTLP_HEADERS` | The headers to send with the spans.          | `""` |
