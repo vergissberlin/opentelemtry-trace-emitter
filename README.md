@@ -5,10 +5,18 @@ If you want to test your OpenTelemtry configuration with a random span emitter.
 ## Usage
 
 ```bash
+docker pull ghcr.io/vergissberlin/opentelemetry-trace-emitter:latest
+```
+
+```shell
+docker manifest inspect ghcr.io/vergissberlin/opentelemetry-trace-emitter:latest
+```
+
+```bash
 docker run -it --rm \
   -e OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317 \
   -e OTEL_RESOURCE_ATTRIBUTES=service.name=example-service \
-  ghcr.io/rafaelmartins/opentelemetry-trace-emitter:latest
+  ghcr.io/vergissberlin/opentelemetry-trace-emitter
 ```
 
 ## Environment Variables
