@@ -1,0 +1,10 @@
+{
+    "name": "opentelemetry-trace-emitter",
+    "version": "1.0.0",
+    "main": "tracer.js",
+    "dependencies": {
+        "@opentelemetry/api": "^1.7.0",
+        "@opentelemetry/sdk-trace-node": "^1.16.0",
+        "@opentelemetry/exporter-trace-otlp-http": "^1.16.0"
+    }
+}

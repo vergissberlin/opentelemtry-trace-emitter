@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opentelemetry-trace-emitter
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opentelemetry-trace-emitter
+  template:
+    metadata:
+      labels:
+        app: opentelemetry-trace-emitter
+    spec:
+      containers:
+        - name: opentelemetry-trace-emitter
+          image: vergissberlin/opentelemetry-trace-emitter:latest
+          env:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: 'http://otel-collector:4317'
+          command: ['/bin/sh']
+          args: ['-c', 'while true; do your-trace-emitter-command; sleep 10; done']
