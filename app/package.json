@@ -2,10 +2,25 @@
     "name": "opentelemetry-trace-emitter",
     "version": "1.0.0",
     "main": "tracer.js",
+    "description": "OpenTelemetry Trace Emitter Example",
+    "scripts": {
+        "start": "node tracer.mjs"
+    },
+    "author": "Your Name",
+    "type": "module",
     "dependencies": {
         "@opentelemetry/api": "^1.9.0",
-        "@opentelemetry/exporter-trace-otlp-grpc": "^0.200.0",
-        "@opentelemetry/sdk-trace-base": "^2.0.0",
-        "@opentelemetry/sdk-trace-node": "^2.0.0"
+        "@opentelemetry/api-logs": "^0.52.1",
+        "@opentelemetry/auto-instrumentations-node": "^0.48.0",
+        "@opentelemetry/exporter-collector-grpc": "^0.25.0",
+        "@opentelemetry/exporter-metrics-otlp-grpc": "^0.52.1",
+        "@opentelemetry/exporter-metrics-otlp-proto": "^0.52.1",
+        "@opentelemetry/exporter-trace-otlp-grpc": "^0.52.1",
+        "@opentelemetry/exporter-trace-otlp-proto": "^0.52.1",
+        "@opentelemetry/resources": "^1.25.1",
+        "@opentelemetry/sdk-metrics": "^1.25.1",
+        "@opentelemetry/sdk-node": "^0.52.1",
+        "@opentelemetry/sdk-trace-node": "^1.25.1",
+        "@opentelemetry/semantic-conventions": "^1.25.1"
     }
 }
