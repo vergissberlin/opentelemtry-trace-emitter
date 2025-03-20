@@ -16,8 +16,13 @@ spec:
       containers:
         - name: opentelemetry-trace-emitter
           image: vergissberlin/opentelemetry-trace-emitter:latest
+          resources:
+            limits:
+              memory: '128Mi'
+              cpu: '500m'
+            requests:
+              memory: '64Mi'
+              cpu: '250m'
           env:
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: 'http://otel-collector:4317'
-          command: ['/bin/sh']
-          args: ['-c', 'while true; do your-trace-emitter-command; sleep 10; done']
