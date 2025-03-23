@@ -69,6 +69,19 @@ const randomAttributes = [
     {key: 'processing.time_ms', value: () => Math.floor(Math.random() * 500)}
 ]
 
+const randomLogs = [
+    'Starting process',
+    'Fetching data',
+    'Processing request',
+    'Sending response',
+    'Operation completed',
+    'Error occurred',
+    'Retrying operation',
+    'Operation successful',
+    'Data saved',
+    'Connection established'
+]
+
 function generateRandomTrace() {
     const randomTraceName = traceNames[Math.floor(Math.random() * traceNames.length)]
     const randomProcessName = processNames[Math.floor(Math.random() * processNames.length)]
@@ -83,7 +96,10 @@ function generateRandomTrace() {
             }
         })
 
-        console.log(`Trace: ${randomTraceName} | Span: ${randomProcessName} | Trace ID: ${rootSpan.spanContext().traceId}`)
+        const randomLog = randomLogs[Math.floor(Math.random() * randomLogs.length)]
+        span.addEvent(randomLog)
+
+        console.log(`Trace: ${randomTraceName} | Span: ${randomProcessName} | Trace ID: ${rootSpan.spanContext().traceId} | Log: ${randomLog}`)
         span.setStatus({code: SpanStatusCode.OK})
         span.end()
     })
