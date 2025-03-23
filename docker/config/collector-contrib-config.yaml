@@ -57,7 +57,6 @@ exporters:
     metrics:
       histograms:
         mode: 'distributions'
-      tags: ['service.name', 'env', 'version']
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Connectors
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::
