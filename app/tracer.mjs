@@ -19,6 +19,10 @@ import {MeterProvider} from '@opentelemetry/sdk-metrics'
 import {randomUUID} from 'crypto'
 import {CollectorLogExporter} from '@opentelemetry/exporter-collector-grpc' // Add this import
 
+import logger from './logger.js'
+logger.info("Example log line with trace correlation info")
+
+
 const instanceId = randomUUID()
 const collectorUrl = process.env.OTEL_COLLECTOR_ENDPOINT || 'http://localhost:4317'
 const traceInterval = parseInt(process.env.TRACE_INTERVAL, 10) || 5000
@@ -171,6 +175,7 @@ const randomLogs = [
 function generateRandomTrace() {
     const randomTraceName = traceNames[Math.floor(Math.random() * traceNames.length)]
     const randomProcessName = processNames[Math.floor(Math.random() * processNames.length)]
+    logger.info("Generate radom trace", {traceName: randomTraceName, processName: randomProcessName})
 
     const rootSpan = tracer.startSpan(randomTraceName)
     context.with(trace.setSpan(context.active(), rootSpan), () => {
