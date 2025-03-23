@@ -18,6 +18,8 @@ You can ope it by clicking on the link in the logs while holding the CTRL key.
 docker compose -f docker/compose.yaml logs aspire 
 ```
 
+## 3. Stop the Docker container
+
 ```bash
 docker compose -f docker/compose.yaml ps
 ```
