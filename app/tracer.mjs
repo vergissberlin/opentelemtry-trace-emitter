@@ -17,6 +17,7 @@ import {
 import {trace, context, SpanStatusCode} from '@opentelemetry/api'
 import {MeterProvider} from '@opentelemetry/sdk-metrics'
 import {randomUUID} from 'crypto'
+import {CollectorLogExporter} from '@opentelemetry/exporter-collector-grpc' // Add this import
 
 const instanceId = randomUUID()
 const collectorUrl = process.env.OTEL_COLLECTOR_ENDPOINT || 'http://localhost:4317'
@@ -43,6 +44,9 @@ const sdk = new opentelemetry.NodeSDK({
         exporter: metricExporter,
     }),
     instrumentations: [getNodeAutoInstrumentations()],
+    logExporter: new CollectorLogExporter({ // Add log exporter configuration
+        url: collectorUrl
+    })
 })
 
 try {
@@ -51,7 +55,6 @@ try {
     console.error('Failed to start the SDK:', error)
     process.exit(1)
 }
-
 
 const meterProvider = new MeterProvider({
     resource: new Resource({
