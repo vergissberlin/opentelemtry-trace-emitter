@@ -5,45 +5,48 @@ import {PeriodicExportingMetricReader} from '@opentelemetry/sdk-metrics'
 import {CollectorTraceExporter} from '@opentelemetry/exporter-collector-grpc'
 import {Resource} from '@opentelemetry/resources'
 import {
-    SEMRESATTRS_SERVICE_NAME,
-    SEMRESATTRS_SERVICE_VERSION,
-    SemanticAttributes
+    ATTR_SERVICE_NAME,
+    ATTR_SERVICE_VERSION,
+    SERVICE_INSTANCE_ID,
+    DEPLOYMENT_ENVIRONMENT,
 } from '@opentelemetry/semantic-conventions'
 import {trace, context, SpanStatusCode} from '@opentelemetry/api'
 import {MeterProvider} from '@opentelemetry/sdk-metrics'
 
 const collectorUrl = process.env.OTEL_COLLECTOR_ENDPOINT || 'http://localhost:4317'
 const traceInterval = parseInt(process.env.TRACE_INTERVAL, 10) || 5000
+const metricExporter = new OTLPMetricExporter({
+    url: `${collectorUrl}`
+})
 
 const sdk = new opentelemetry.NodeSDK({
     resource: new Resource({
-        [SEMRESATTRS_SERVICE_NAME]: 'opentelemetry-trace-emitter',
-        [SEMRESATTRS_SERVICE_VERSION]: '1.0',
-        [SemanticAttributes.SERVICE_INSTANCE_ID]: '1',
+        [ATTR_SERVICE_NAME]: 'opentelemetry-trace-emitter',
+        [ATTR_SERVICE_VERSION]: '1.0.0',
+        [SERVICE_INSTANCE_ID]: '1',
+        [DEPLOYMENT_ENVIRONMENT]: 'production',
     }),
     traceExporter: new CollectorTraceExporter({
         url: collectorUrl
     }),
     metricReader: new PeriodicExportingMetricReader({
-        exporter: new OTLPMetricExporter({
-            url: `${collectorUrl}/v1/metrics`,
-            headers: {},
-        }),
+        exporter: metricExporter,
     }),
     instrumentations: [getNodeAutoInstrumentations()],
 })
+
 sdk.start()
+    .then(() => console.log('✅ OpenTelemetry gestartet'))
+    .catch((err) => console.error('❌ Fehler beim Starten von OpenTelemetry:', err))
 
 const meterProvider = new MeterProvider({
     resource: new Resource({
-        [SEMRESATTRS_SERVICE_NAME]: 'opentelemetry-trace-emitter',
-        [SEMRESATTRS_SERVICE_VERSION]: '1.0',
-        [SemanticAttributes.SERVICE_INSTANCE_ID]: '1',
+        [ATTR_SERVICE_NAME]: 'opentelemetry-trace-emitter',
+        [ATTR_SERVICE_VERSION]: '1.0.0',
+        [DEPLOYMENT_ENVIRONMENT]: 'production',
+        [SERVICE_INSTANCE_ID]: '1',
     }),
-    exporter: new OTLPMetricExporter({
-        url: `${collectorUrl}/v1/metrics`,
-        headers: {},
-    }),
+    exporter: metricExporter,
     interval: 1000,
 })
 

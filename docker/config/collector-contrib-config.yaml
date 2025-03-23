@@ -54,7 +54,10 @@ exporters:
     api:
       site: ${env:DD_SITE}
       key: ${env:DD_API_KEY}
-
+    metrics:
+      histograms:
+        mode: 'distributions'
+      tags: ['service.name', 'env', 'version']
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Connectors
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::
