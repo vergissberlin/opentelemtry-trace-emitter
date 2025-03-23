@@ -10,6 +10,7 @@ import {
     SemanticAttributes
 } from '@opentelemetry/semantic-conventions'
 import {trace, context, SpanStatusCode} from '@opentelemetry/api'
+import {MeterProvider} from '@opentelemetry/sdk-metrics'
 
 const collectorUrl = process.env.OTEL_COLLECTOR_ENDPOINT || 'http://localhost:4317'
 const traceInterval = parseInt(process.env.TRACE_INTERVAL, 10) || 5000
@@ -32,6 +33,27 @@ const sdk = new opentelemetry.NodeSDK({
     instrumentations: [getNodeAutoInstrumentations()],
 })
 sdk.start()
+
+const meterProvider = new MeterProvider({
+    resource: new Resource({
+        [SEMRESATTRS_SERVICE_NAME]: 'opentelemetry-trace-emitter',
+        [SEMRESATTRS_SERVICE_VERSION]: '1.0',
+        [SemanticAttributes.SERVICE_INSTANCE_ID]: '1',
+    }),
+    exporter: new OTLPMetricExporter({
+        url: `${collectorUrl}/v1/metrics`,
+        headers: {},
+    }),
+    interval: 1000,
+})
+
+const meter = meterProvider.getMeter('custom-metrics')
+const requestCount = meter.createCounter('request_count', {
+    description: 'Count of requests',
+})
+const requestDuration = meter.createHistogram('request_duration', {
+    description: 'Duration of requests',
+})
 
 const tracer = trace.getTracer('random-tracer')
 
@@ -102,6 +124,10 @@ function generateRandomTrace() {
         console.log(`Trace: ${randomTraceName} | Span: ${randomProcessName} | Trace ID: ${rootSpan.spanContext().traceId} | Log: ${randomLog}`)
         span.setStatus({code: SpanStatusCode.OK})
         span.end()
+
+        // Record custom metrics
+        requestCount.add(1, {process: randomProcessName})
+        requestDuration.record(Math.random() * 1000, {process: randomProcessName})
     })
 
     rootSpan.end()
