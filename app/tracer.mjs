@@ -7,6 +7,10 @@ import {Resource} from '@opentelemetry/resources'
 import {
     ATTR_SERVICE_NAME,
     ATTR_SERVICE_VERSION,
+    ATTR_NETWORK_PEER_ADDRESS,
+    ATTR_NETWORK_PEER_PORT,
+    ATTR_NETWORK_PROTOCOL_NAME,
+    ATTR_NETWORK_PROTOCOL_VERSION,
     SemanticAttributes,
     SemanticResourceAttributes,
 } from '@opentelemetry/semantic-conventions'
@@ -24,7 +28,11 @@ const metricExporter = new OTLPMetricExporter({
 const sdk = new opentelemetry.NodeSDK({
     resource: new Resource({
         [ATTR_SERVICE_NAME]: 'opentelemetry-trace-emitter',
-        [ATTR_SERVICE_VERSION]: '1.0.0',
+        [ATTR_SERVICE_VERSION]: '1.0.1',
+        [ATTR_NETWORK_PEER_ADDRESS]: 'localhost',
+        [ATTR_NETWORK_PEER_PORT]: 8080,
+        [ATTR_NETWORK_PROTOCOL_NAME]: 'http',
+        [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
         [SemanticResourceAttributes.SERVICE_INSTANCE_ID]: instanceId,
         ["deployment.environment"]: 'production',
     }),
@@ -49,6 +57,10 @@ const meterProvider = new MeterProvider({
     resource: new Resource({
         [ATTR_SERVICE_NAME]: 'opentelemetry-trace-emitter',
         [ATTR_SERVICE_VERSION]: '1.0.0',
+        [ATTR_NETWORK_PEER_ADDRESS]: 'localhost',
+        [ATTR_NETWORK_PEER_PORT]: 8080,
+        [ATTR_NETWORK_PROTOCOL_NAME]: 'http',
+        [ATTR_NETWORK_PROTOCOL_VERSION]: '1.1',
         ["deployment.environment"]: 'production',
         [SemanticResourceAttributes.SERVICE_INSTANCE_ID]: instanceId,
     }),
@@ -134,7 +146,6 @@ function generateRandomTrace() {
         span.setStatus({code: SpanStatusCode.OK})
         span.end()
 
-        // Record custom metrics
         requestCount.add(1, {process: randomProcessName})
         requestDuration.record(Math.random() * 1000, {process: randomProcessName})
     })
