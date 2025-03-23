@@ -13,6 +13,8 @@ import {
 import {trace, context, SpanStatusCode} from '@opentelemetry/api'
 import {MeterProvider} from '@opentelemetry/sdk-metrics'
 
+
+const instanceId = require('crypto').randomUUID()
 const collectorUrl = process.env.OTEL_COLLECTOR_ENDPOINT || 'http://localhost:4317'
 const traceInterval = parseInt(process.env.TRACE_INTERVAL, 10) || 5000
 const metricExporter = new OTLPMetricExporter({
@@ -23,8 +25,9 @@ const sdk = new opentelemetry.NodeSDK({
     resource: new Resource({
         [ATTR_SERVICE_NAME]: 'opentelemetry-trace-emitter',
         [ATTR_SERVICE_VERSION]: '1.0.0',
-        [SERVICE_INSTANCE_ID]: '1',
+        [SERVICE_INSTANCE_ID]: instanceId,
         [DEPLOYMENT_ENVIRONMENT]: 'production',
+
     }),
     traceExporter: new CollectorTraceExporter({
         url: collectorUrl
@@ -44,7 +47,7 @@ const meterProvider = new MeterProvider({
         [ATTR_SERVICE_NAME]: 'opentelemetry-trace-emitter',
         [ATTR_SERVICE_VERSION]: '1.0.0',
         [DEPLOYMENT_ENVIRONMENT]: 'production',
-        [SERVICE_INSTANCE_ID]: '1',
+        [SERVICE_INSTANCE_ID]: instanceId,
     }),
     exporter: metricExporter,
     interval: 1000,
