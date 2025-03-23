@@ -1,0 +1,35 @@
+name: 'opentelemetry-emitter'
+
+services:
+  collector:
+    image: otel/opentelemetry-collector-contrib:0.104.0
+    container_name: otel-collector-contrib
+    command: ['--config=/etc/otelcol/config.yaml']
+    env_file:
+      - ./.env
+    ports:
+      - '4317:4317' # OLTP receiver over GRPC
+      - '4318:4318' # OTLP receiver over HTTP
+    volumes:
+      - ./config/collector-contrib-config.yaml:/etc/otelcol/config.yaml
+      - ./logs/collector-contrib.json:/logs/collector.json
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  aspire:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:8.0.0
+    container_name: otel-receiver-aspire
+    ports:
+      - 18888:18888
+
+  opentelemetry-trace-emitter:
+    image: ghcr.io/vergissberlin/opentelemetry-trace-emitter:latest
+    container_name: otel-emitter
+    depends_on:
+      - opentelemetry-colector-contrib
+    environment:
+      - OTEL_COLLECTOR_ENDPOINT=http://otel-collector-contrib:4317
+
+networks:
+  default:
+    external: true
+    name: opentelemetry-emitter-network

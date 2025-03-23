@@ -1,0 +1,71 @@
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Receivers
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+        cors:
+          allowed_origins:
+            - "*"
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Processors
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+processors:
+  batch:
+  filter:
+    metrics:
+      exclude:
+        match_type: strict
+        metric_names:
+          - queueSize
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Exporters
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+exporters:
+  file:
+    path: /logs/collector.json
+  debug:
+    verbosity: detailed
+  otlp:
+    endpoint: "jaeger:4317"
+    tls:
+      insecure: true
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Extensions
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# extensions:
+#   health_check:
+#   pprof:
+#   zpages:
+
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Service
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: 
+        - filter
+        - batch
+      exporters: 
+        - file
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: 
+        - file
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: 
+        - file
+        - otlp

@@ -30,13 +30,7 @@ const sdk = new opentelemetry.NodeSDK({
     }),
     instrumentations: [getNodeAutoInstrumentations()],
 })
-
-if (process.env.DEBUG) {
-    sdk.start()
-    sdk.on('error', (err) => {
-        console.error('Error sending traces:', err)
-    })
-}
+sdk.start()
 
 const tracer = trace.getTracer('random-tracer')
 

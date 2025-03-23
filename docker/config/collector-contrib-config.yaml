@@ -1,0 +1,98 @@
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Receivers
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+  hostmetrics:
+    collection_interval: 10s
+    scrapers:
+      cpu:
+      disk:
+      filesystem:
+      load:
+      memory:
+      network:
+      paging:
+
+  docker_stats:
+    endpoint: unix:///var/run/docker.sock
+    collection_interval: 15s
+    metrics:
+      container.cpu.usage.percpu:
+        enabled: true
+      container.network.io.usage.tx_dropped:
+        enabled: false
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Processors
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+processors:
+  batch:
+    timeout: 12s
+    send_batch_max_size: 1000
+    send_batch_size: 100
+  resourcedetection:
+    detectors: [env, system]
+  cumulativetodelta:
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Exporters
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+exporters:
+  debug:
+    verbosity: detailed
+  otlp/jaeger:
+    tls:
+      insecure: true
+    endpoint: jaeger:4317
+  otlp/aspire:
+    tls:
+      insecure: true
+    endpoint: aspire:18889
+  prometheus:
+    endpoint: 0.0.0.0:9090
+    namespace: testapp
+  datadog:
+    api:
+      site: ${env:DD_SITE}
+      key: ${env:DD_API_KEY}
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Connectors
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+connectors:
+  datadog/connector:
+
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Extensions
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+extensions:
+  health_check: {}
+
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+# Service
+# ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp, hostmetrics,  datadog/connector, docker_stats]
+      processors: [cumulativetodelta, batch, resourcedetection]
+      exporters: [debug, prometheus, otlp/aspire, datadog]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug, otlp/aspire, datadog]
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug, otlp/jaeger, otlp/aspire, datadog/connector]
+    traces/2:
+      receivers: [otlp, datadog/connector]
+      processors: [batch]
+      exporters: [debug, otlp/jaeger, otlp/aspire, datadog]
