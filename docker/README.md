@@ -5,7 +5,7 @@
 ```bash
 docker network create opentelemetry-emitter-network
 docker compose -f docker/compose.yaml down
-# docker compose -f docker/compose.yaml pull
+docker compose -f docker/compose.yaml pull
 docker compose -f docker/compose.yaml up -d
 ```
 
@@ -26,7 +26,7 @@ docker compose -f docker/compose.yaml ps
 docker compose -f docker/compose.yaml logs -f collector
 ```
 
-## Local build
+## 3. Local build
 
 ```bash
 docker build -t opentelemetry-trace-emitter ./app/
