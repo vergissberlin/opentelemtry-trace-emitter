@@ -11,7 +11,7 @@ import {
 } from '@opentelemetry/semantic-conventions'
 import {trace, context, SpanStatusCode} from '@opentelemetry/api'
 
-const collectorUrl = process.env.OTEL_COLLECTOR_URL || 'http://localhost:4317'
+const collectorUrl = process.env.OTEL_COLLECTOR_ENDPOINT || 'http://localhost:4317'
 const traceInterval = parseInt(process.env.TRACE_INTERVAL, 10) || 5000
 
 const sdk = new opentelemetry.NodeSDK({
@@ -31,7 +31,12 @@ const sdk = new opentelemetry.NodeSDK({
     instrumentations: [getNodeAutoInstrumentations()],
 })
 
-sdk.start()
+if (process.env.DEBUG) {
+    sdk.start()
+    sdk.on('error', (err) => {
+        console.error('Error sending traces:', err)
+    })
+}
 
 const tracer = trace.getTracer('random-tracer')
 

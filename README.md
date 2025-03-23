@@ -14,17 +14,15 @@ docker pull ghcr.io/vergissberlin/opentelemetry-trace-emitter:latest
 
 ```bash
 docker run -it --rm \
-    -e OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317 \
+    -e OTEL_COLLECTOR_ENDPOINT=http://localhost:4317 \
     ghcr.io/vergissberlin/opentelemetry-trace-emitter
 ```
 
 ## Environment Variables
 
-|         Environment Variable         |                 Description                  |            Default             |
-| ------------------------------------ | -------------------------------------------- | ------------------------------ |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | The endpoint to send the spans to.           | `http://localhost:4317` |
-| `OTEL_RESOURCE_ATTRIBUTES` | The resource attributes to add to the spans. | `service.name=example-service` |
-| `OTEL_TRACES_EXPORTER` | The exporter to use.                         | `otlp` |
-| `OTEL_TRACES_EXPORTER_OTLP_ENDPOINT` | The endpoint to send the spans to.           | `http://localhost:4317` |
-| `OTEL_TRACES_EXPORTER_OTLP_INSECURE` | Whether to use insecure connection.          | `false` |
-| `OTEL_TRACES_EXPORTER_OTLP_HEADERS` | The headers to send with the spans.          | `""` |
+|   Environment Variable    |                  Description                   |         Default         |
+| ------------------------- | ---------------------------------------------- | ----------------------- |
+| `OTEL_COLLECTOR_ENDPOINT` | The endpoint to send the spans to.             | `http://localhost:4317` |
+| `TRACE_INTERVAL` | The timeout for the exporter.                  | `5000` |
+| `SPAN_COUNT_MAX` | The maximum number of spans per trace to send. | `12` |
+| `DEBUG` | Enable debug mode.                             | `false` |
