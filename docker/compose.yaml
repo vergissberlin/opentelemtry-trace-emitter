@@ -2,9 +2,10 @@ name: 'opentelemetry-emitter'
 
 services:
   collector:
-    image: otel/opentelemetry-collector-contrib:0.104.0
+    image: otel/opentelemetry-collector-contrib:latest
     container_name: otel-collector-contrib
     command: ['--config=/etc/otelcol/config.yaml']
+    privileged: true
     env_file:
       - ./.env
     ports:
@@ -21,11 +22,11 @@ services:
     ports:
       - 18888:18888
 
-  opentelemetry-trace-emitter:
+  emitter:
     image: ghcr.io/vergissberlin/opentelemetry-trace-emitter:latest
     container_name: otel-emitter
     depends_on:
-      - opentelemetry-colector-contrib
+      - collector
     environment:
       - OTEL_COLLECTOR_ENDPOINT=http://otel-collector-contrib:4317
 

@@ -18,6 +18,7 @@ const sdk = new opentelemetry.NodeSDK({
     resource: new Resource({
         [SEMRESATTRS_SERVICE_NAME]: 'opentelemetry-trace-emitter',
         [SEMRESATTRS_SERVICE_VERSION]: '1.0',
+        [SemanticAttributes.SERVICE_INSTANCE_ID]: '1',
     }),
     traceExporter: new CollectorTraceExporter({
         url: collectorUrl

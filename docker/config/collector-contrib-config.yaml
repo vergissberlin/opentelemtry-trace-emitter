@@ -46,17 +46,10 @@ processors:
 exporters:
   debug:
     verbosity: detailed
-  otlp/jaeger:
-    tls:
-      insecure: true
-    endpoint: jaeger:4317
   otlp/aspire:
     tls:
       insecure: true
     endpoint: aspire:18889
-  prometheus:
-    endpoint: 0.0.0.0:9090
-    namespace: testapp
   datadog:
     api:
       site: ${env:DD_SITE}
@@ -67,7 +60,6 @@ exporters:
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 connectors:
   datadog/connector:
-
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # Extensions
@@ -81,9 +73,9 @@ extensions:
 service:
   pipelines:
     metrics:
-      receivers: [otlp, hostmetrics,  datadog/connector, docker_stats]
+      receivers: [otlp, hostmetrics, datadog/connector] # docker_stats
       processors: [cumulativetodelta, batch, resourcedetection]
-      exporters: [debug, prometheus, otlp/aspire, datadog]
+      exporters: [debug, otlp/aspire, datadog]
     logs:
       receivers: [otlp]
       processors: [batch]
@@ -91,8 +83,8 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [debug, otlp/jaeger, otlp/aspire, datadog/connector]
+      exporters: [debug, otlp/aspire, datadog/connector]
     traces/2:
       receivers: [otlp, datadog/connector]
       processors: [batch]
-      exporters: [debug, otlp/jaeger, otlp/aspire, datadog]
+      exporters: [debug, otlp/aspire, datadog]
