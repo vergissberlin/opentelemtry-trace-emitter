@@ -14,9 +14,9 @@ const tracingFormat = function () {
     })()
 }
 
-module.exports = winston.createLogger({
-    transports: [new winston.transports.Console],
+const logger = winston.createLogger({
+    transports: [new winston.transports.Console()],
     format: winston.format.combine(tracingFormat(), winston.format.json())
 })
 
-// ##########
+export default logger

@@ -11,23 +11,19 @@ import {
     ATTR_NETWORK_PEER_PORT,
     ATTR_NETWORK_PROTOCOL_NAME,
     ATTR_NETWORK_PROTOCOL_VERSION,
-    SemanticAttributes,
     SemanticResourceAttributes,
+    SemanticAttributes
 } from '@opentelemetry/semantic-conventions'
 import {trace, context, SpanStatusCode} from '@opentelemetry/api'
 import {MeterProvider} from '@opentelemetry/sdk-metrics'
 import {randomUUID} from 'crypto'
-import {CollectorLogExporter} from '@opentelemetry/exporter-collector-grpc' // Add this import
-
-import logger from './logger.js'
-logger.info("Example log line with trace correlation info")
-
 
 const instanceId = randomUUID()
 const collectorUrl = process.env.OTEL_COLLECTOR_ENDPOINT || 'http://localhost:4317'
 const traceInterval = parseInt(process.env.TRACE_INTERVAL, 10) || 5000
+
 const metricExporter = new OTLPMetricExporter({
-    url: `${collectorUrl}`
+    url: `${collectorUrl}`,
 })
 
 const sdk = new opentelemetry.NodeSDK({
@@ -42,15 +38,12 @@ const sdk = new opentelemetry.NodeSDK({
         ["deployment.environment"]: 'production',
     }),
     traceExporter: new CollectorTraceExporter({
-        url: collectorUrl
+        url: collectorUrl,
     }),
     metricReader: new PeriodicExportingMetricReader({
         exporter: metricExporter,
     }),
     instrumentations: [getNodeAutoInstrumentations()],
-    logExporter: new CollectorLogExporter({ // Add log exporter configuration
-        url: collectorUrl
-    })
 })
 
 try {
@@ -124,39 +117,6 @@ const randomAttributes = [
     {key: 'runtime.node.mem.heap_total', value: () => Math.floor(Math.random() * 1024 * 1024 * 1024)},
     {key: 'runtime.node.mem.heap_used', value: () => Math.floor(Math.random() * 1024 * 1024 * 1024)},
     {key: 'runtime.node.mem.external', value: () => Math.floor(Math.random() * 1024 * 1024 * 1024)},
-    {key: 'runtime.node.heap.total_heap_size', value: () => Math.floor(Math.random() * 1024 * 1024 * 1024)},
-    {key: 'runtime.node.heap.total_heap_size_executable', value: () => Math.floor(Math.random() * 1024 * 1024 * 1024)},
-    {key: 'runtime.node.heap.total_physical_size', value: () => Math.floor(Math.random() * 1024 * 1024 * 1024)},
-    {key: 'runtime.node.heap.used_heap_size', value: () => Math.floor(Math.random() * 1024 * 1024 * 1024)},
-    {key: 'runtime.node.heap.heap_size_limit', value: () => Math.floor(Math.random() * 1024 * 1024 * 1024)},
-    {key: 'runtime.node.heap.malloced_memory', value: () => Math.floor(Math.random() * 1024 * 1024 * 1024)},
-    {key: 'runtime.node.heap.peak_malloced_memory', value: () => Math.floor(Math.random() * 1024 * 1024 * 1024)},
-    {key: 'runtime.node.heap.size.by.space', value: () => Math.floor(Math.random() * 1024 * 1024 * 1024)},
-    {key: 'runtime.node.heap.used_size.by.space', value: () => Math.floor(Math.random() * 1024 * 1024 * 1024)},
-    {key: 'runtime.node.heap.available_size.by.space', value: () => Math.floor(Math.random() * 1024 * 1024 * 1024)},
-    {key: 'runtime.node.heap.physical_size.by.space', value: () => Math.floor(Math.random() * 1024 * 1024 * 1024)},
-    {key: 'runtime.node.process.uptime', value: () => Math.floor(Math.random() * 100000)},
-    {key: 'runtime.node.event_loop.delay.max', value: () => Math.floor(Math.random() * 1000000)},
-    {key: 'runtime.node.event_loop.delay.min', value: () => Math.floor(Math.random() * 1000000)},
-    {key: 'runtime.node.event_loop.delay.avg', value: () => Math.floor(Math.random() * 1000000)},
-    {key: 'runtime.node.event_loop.delay.sum', value: () => Math.floor(Math.random() * 1000000)},
-    {key: 'runtime.node.event_loop.delay.median', value: () => Math.floor(Math.random() * 1000000)},
-    {key: 'runtime.node.event_loop.delay.95percentile', value: () => Math.floor(Math.random() * 1000000)},
-    {key: 'runtime.node.event_loop.delay.count', value: () => Math.floor(Math.random() * 1000)},
-    {key: 'runtime.node.gc.pause.max', value: () => Math.floor(Math.random() * 1000000)},
-    {key: 'runtime.node.gc.pause.min', value: () => Math.floor(Math.random() * 1000000)},
-    {key: 'runtime.node.gc.pause.avg', value: () => Math.floor(Math.random() * 1000000)},
-    {key: 'runtime.node.gc.pause.sum', value: () => Math.floor(Math.random() * 1000000)},
-    {key: 'runtime.node.gc.pause.median', value: () => Math.floor(Math.random() * 1000000)},
-    {key: 'runtime.node.gc.pause.95percentile', value: () => Math.floor(Math.random() * 1000000)},
-    {key: 'runtime.node.gc.pause.count', value: () => Math.floor(Math.random() * 1000)},
-    {key: 'runtime.node.gc.pause.by.type.max', value: () => Math.floor(Math.random() * 1000000)},
-    {key: 'runtime.node.gc.pause.by.type.min', value: () => Math.floor(Math.random() * 1000000)},
-    {key: 'runtime.node.gc.pause.by.type.avg', value: () => Math.floor(Math.random() * 1000000)},
-    {key: 'runtime.node.gc.pause.by.type.sum', value: () => Math.floor(Math.random() * 1000000)},
-    {key: 'runtime.node.gc.pause.by.type.median', value: () => Math.floor(Math.random() * 1000000)},
-    {key: 'runtime.node.gc.pause.by.type.95percentile', value: () => Math.floor(Math.random() * 1000000)},
-    {key: 'runtime.node.gc.pause.by.type.count', value: () => Math.floor(Math.random() * 1000)},
 ]
 
 const randomLogs = [
@@ -175,8 +135,6 @@ const randomLogs = [
 function generateRandomTrace() {
     const randomTraceName = traceNames[Math.floor(Math.random() * traceNames.length)]
     const randomProcessName = processNames[Math.floor(Math.random() * processNames.length)]
-    logger.info("Generate radom trace", {traceName: randomTraceName, processName: randomProcessName})
-
     const rootSpan = tracer.startSpan(randomTraceName)
     context.with(trace.setSpan(context.active(), rootSpan), () => {
         const span = tracer.startSpan(randomProcessName)
