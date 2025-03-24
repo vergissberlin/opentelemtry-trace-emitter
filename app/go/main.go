@@ -13,6 +13,7 @@ import (
 	dd_logrus "github.com/DataDog/dd-trace-go/contrib/sirupsen/logrus/v2"
 	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -51,11 +52,21 @@ func setupOpenTelemetry(ctx context.Context) (*sdktrace.TracerProvider, *sdkmetr
 		return nil, nil, fmt.Errorf("failed to create metric exporter: %w", err)
 	}
 
+	span := trace.SpanFromContext(ctx)
+	if !span.SpanContext().IsValid() {
+		ctx, span = otel.Tracer("otel-go-example").Start(ctx, "new-span")
+		defer span.End()
+	}
+	traceID := span.SpanContext().TraceID().String()
+	spanID := span.SpanContext().SpanID().String()
+
 	res := resource.NewWithAttributes(
 		semconv.SchemaURL,
 		semconv.ServiceNameKey.String("emitter-go"),
 		semconv.ServiceVersionKey.String("1.0.0"),
 		semconv.ServiceInstanceIDKey.String(generateInstanceID()),
+		attribute.String("dd.trace_id", traceID),
+		attribute.String("dd.span_id", spanID),
 	)
 
 	tracerProvider := sdktrace.NewTracerProvider(
@@ -100,16 +111,22 @@ func generateRandomLog(ctx context.Context) {
 	spanID := span.SpanContext().SpanID().String()
 
 	logrus.WithContext(ctx).WithFields(logrus.Fields{
-		"trace_id": traceID,
-		"span_id":  spanID,
+		"dd.trace_id": traceID,
+		"dd.span_id":  spanID,
 	}).Info(message)
 }
 
 func newResource() (*resource.Resource, error) {
+	span := trace.SpanFromContext(context.Background())
+	traceID := span.SpanContext().TraceID().String()
+	spanID := span.SpanContext().SpanID().String()
+
 	return resource.Merge(resource.Default(),
 		resource.NewWithAttributes(semconv.SchemaURL,
 			semconv.ServiceName("emitter-go"),
 			semconv.ServiceVersion("0.1.0"),
+			attribute.String("dd.trace_id", traceID),
+			attribute.String("dd.span_id", spanID),
 		))
 }
 
@@ -146,14 +163,20 @@ func main() {
 	}
 
 	defer func() {
-		if err := tracerProvider.Shutdown(ctx); err != nil {
-			log.Printf("Error shutting down TracerProvider: %v", err)
+		if tracerProvider != nil {
+			if err := tracerProvider.Shutdown(ctx); err != nil {
+				log.Printf("Error shutting down TracerProvider: %v", err)
+			}
 		}
-		if err := meterProvider.Shutdown(ctx); err != nil {
-			log.Printf("Error shutting down MeterProvider: %v", err)
+		if meterProvider != nil {
+			if err := meterProvider.Shutdown(ctx); err != nil {
+				log.Printf("Error shutting down MeterProvider: %v", err)
+			}
 		}
-		if err := loggerProvider.Shutdown(ctx); err != nil {
-			fmt.Println(err)
+		if loggerProvider != nil {
+			if err := loggerProvider.Shutdown(ctx); err != nil {
+				fmt.Println(err)
+			}
 		}
 	}()
 
