@@ -22,9 +22,17 @@ services:
     ports:
       - 18888:18888
 
-  emitter:
-    image: ghcr.io/vergissberlin/opentelemetry-trace-emitter:latest
-    container_name: otel-emitter
+  emitter-javascript:
+    image: ghcr.io/vergissberlin/opentelemetry-trace-emitter:javascript
+    container_name: otel-emitter-javascript
+    depends_on:
+      - collector
+    environment:
+      - OTEL_COLLECTOR_ENDPOINT=http://otel-collector-contrib:4317
+
+  emitter-go:
+    image: ghcr.io/vergissberlin/opentelemetry-trace-emitter:go
+    container_name: otel-emitter-go
     depends_on:
       - collector
     environment:

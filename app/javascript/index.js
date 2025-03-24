@@ -1,4 +1,4 @@
-import * as opentelemetry from '@opentelemetry/sdk-node'
+import {NodeSDK} from '@opentelemetry/sdk-node'
 import {getNodeAutoInstrumentations} from '@opentelemetry/auto-instrumentations-node'
 import {OTLPMetricExporter} from '@opentelemetry/exporter-metrics-otlp-proto'
 import {PeriodicExportingMetricReader} from '@opentelemetry/sdk-metrics'
@@ -26,7 +26,7 @@ const metricExporter = new OTLPMetricExporter({
     url: `${collectorUrl}`,
 })
 
-const sdk = new opentelemetry.NodeSDK({
+const sdk = new NodeSDK({
     resource: new Resource({
         [ATTR_SERVICE_NAME]: 'opentelemetry-trace-emitter',
         [ATTR_SERVICE_VERSION]: '1.0.1',

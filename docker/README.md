@@ -30,6 +30,16 @@ docker compose -f docker/compose.yaml logs -f collector
 
 ## 3. Local build
 
+If you want to build the image locally, you can do so by running the following command:
+
+### JavaScript
+
 ```bash
-docker build -t opentelemetry-trace-emitter ./app/
+docker build -t opentelemetry-trace-emitter:javascript ./app/javascript/
+```
+
+### Go
+
+```bash
+docker build -t opentelemetry-trace-emitter:go ./app/go/
 ```

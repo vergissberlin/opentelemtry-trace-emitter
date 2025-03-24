@@ -4,10 +4,9 @@
     "main": "index.js",
     "description": "OpenTelemetry Trace Emitter Example",
     "scripts": {
-        "start": "node index.mjs"
+        "start": "node index.js"
     },
-    "author": "Your Name",
-    "type": "module",
+    "author": "André Lademann",
     "dependencies": {
         "@opentelemetry/api": "^1.9.0",
         "@opentelemetry/api-logs": "^0.52.1",
