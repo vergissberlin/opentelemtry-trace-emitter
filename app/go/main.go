@@ -10,6 +10,7 @@ import (
 	"os"
 	"time"
 
+	dd_logrus "github.com/DataDog/dd-trace-go/contrib/sirupsen/logrus/v2"
 	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
@@ -21,7 +22,6 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"go.opentelemetry.io/otel/trace"
-	dd_logrus "gopkg.in/DataDog/dd-trace-go.v1/contrib/sirupsen/logrus"
 )
 
 func generateInstanceID() string {
@@ -95,7 +95,14 @@ func generateRandomLog(ctx context.Context) {
 		"Service started",
 	}
 	message := logMessages[mathRand.Intn(len(logMessages))]
-	logrus.WithContext(ctx).Info(message)
+	span := trace.SpanFromContext(ctx)
+	traceID := span.SpanContext().TraceID().String()
+	spanID := span.SpanContext().SpanID().String()
+
+	logrus.WithContext(ctx).WithFields(logrus.Fields{
+		"trace_id": traceID,
+		"span_id":  spanID,
+	}).Info(message)
 }
 
 func newResource() (*resource.Resource, error) {
@@ -168,8 +175,10 @@ func main() {
 	defer ticker.Stop()
 
 	for range ticker.C {
+		ctx, span := tracer.Start(ctx, "random-trace")
 		generateRandomTrace(tracer)
 		generateRandomLog(ctx)
+		span.End()
 
 		counter.Add(ctx, 1)
 		histogram.Record(ctx, float64(mathRand.Intn(100)))
