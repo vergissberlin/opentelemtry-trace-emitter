@@ -10,6 +10,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
@@ -20,6 +21,7 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"go.opentelemetry.io/otel/trace"
+	dd_logrus "gopkg.in/DataDog/dd-trace-go.v1/contrib/sirupsen/logrus"
 )
 
 func generateInstanceID() string {
@@ -84,7 +86,7 @@ func generateRandomTrace(tracer trace.Tracer) {
 	fmt.Printf("Generated trace: %s\n", operation)
 }
 
-func generateRandomLog() {
+func generateRandomLog(ctx context.Context) {
 	logMessages := []string{
 		"User logged in",
 		"File uploaded",
@@ -93,13 +95,13 @@ func generateRandomLog() {
 		"Service started",
 	}
 	message := logMessages[mathRand.Intn(len(logMessages))]
-	log.Println(message)
+	logrus.WithContext(ctx).Info(message)
 }
 
 func newResource() (*resource.Resource, error) {
 	return resource.Merge(resource.Default(),
 		resource.NewWithAttributes(semconv.SchemaURL,
-			semconv.ServiceName("my-service"),
+			semconv.ServiceName("emitter-go"),
 			semconv.ServiceVersion("0.1.0"),
 		))
 }
@@ -120,6 +122,10 @@ func newLoggerProvider(ctx context.Context, res *resource.Resource) (*logtel.Log
 func main() {
 	ctx := context.Background()
 	res, err := newResource()
+
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+	logrus.AddHook(&dd_logrus.DDContextLogHook{})
+
 	if err != nil {
 		log.Fatalf("Failed to create resource: %v", err)
 	}
@@ -145,11 +151,27 @@ func main() {
 	}()
 
 	tracer := otel.Tracer("otel-go-example")
+	meter := otel.Meter("otel-go-example")
+
+	logrus.WithContext(ctx).Info("Go logs and traces connected!")
+
+	counter, err := meter.Int64Counter("example_counter")
+	if err != nil {
+		log.Fatalf("Failed to create counter: %v", err)
+	}
+	histogram, err := meter.Float64Histogram("example_histogram")
+	if err != nil {
+		log.Fatalf("Failed to create histogram: %v", err)
+	}
+
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 
 	for range ticker.C {
 		generateRandomTrace(tracer)
-		generateRandomLog()
+		generateRandomLog(ctx)
+
+		counter.Add(ctx, 1)
+		histogram.Record(ctx, float64(mathRand.Intn(100)))
 	}
 }
