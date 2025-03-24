@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"log"
 	mathRand "math/rand" // Alias für math/rand, um Konflikte mit crypto/rand zu vermeiden
 	"os"
 	"time"
@@ -13,7 +14,7 @@ import (
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
-	"go.opentelemetry.io/otel/sdk/log"
+	logtel "go.opentelemetry.io/otel/sdk/log"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -21,7 +22,6 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-// Generiert eine zufällige ID für die Instanz
 func generateInstanceID() string {
 	b := make([]byte, 16)
 	_, err := rand.Read(b)
@@ -31,7 +31,6 @@ func generateInstanceID() string {
 	return hex.EncodeToString(b)
 }
 
-// Initialisiert OpenTelemetry für Tracing und Metriken
 func setupOpenTelemetry(ctx context.Context) (*sdktrace.TracerProvider, *sdkmetric.MeterProvider, error) {
 	collectorURL := os.Getenv("OTEL_COLLECTOR_ENDPOINT")
 	if collectorURL == "" {
@@ -105,22 +104,29 @@ func newResource() (*resource.Resource, error) {
 		))
 }
 
-func newLoggerProvider(ctx context.Context, res *resource.Resource) (*log.LoggerProvider, error) {
+func newLoggerProvider(ctx context.Context, res *resource.Resource) (*logtel.LoggerProvider, error) {
 	exporter, err := otlploggrpc.New(ctx)
 	if err != nil {
 		return nil, err
 	}
-	processor := log.NewBatchProcessor(exporter)
-	provider := log.NewLoggerProvider(
-		log.WithResource(res),
-		log.WithProcessor(processor),
+	processor := logtel.NewSimpleProcessor(exporter)
+	provider := logtel.NewLoggerProvider(
+		logtel.WithResource(res),
+		logtel.WithProcessor(processor),
 	)
 	return provider, nil
 }
 
 func main() {
 	ctx := context.Background()
+	res, err := newResource()
+	if err != nil {
+		log.Fatalf("Failed to create resource: %v", err)
+	}
 	loggerProvider, err := newLoggerProvider(ctx, res)
+	if err != nil {
+		log.Fatalf("Failed to create logger provider: %v", err)
+	}
 	tracerProvider, meterProvider, err := setupOpenTelemetry(ctx)
 	if err != nil {
 		log.Fatalf("Failed to initialize OpenTelemetry: %v", err)
@@ -139,7 +145,6 @@ func main() {
 	}()
 
 	tracer := otel.Tracer("otel-go-example")
-
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 
