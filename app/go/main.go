@@ -35,24 +35,24 @@ func generateInstanceID() string {
 func setupOpenTelemetry(ctx context.Context) (*sdktrace.TracerProvider, *sdkmetric.MeterProvider, error) {
 	collectorURL := os.Getenv("OTEL_COLLECTOR_ENDPOINT")
 	if collectorURL == "" {
-		collectorURL = "localhost:4317"
+		collectorURL = "http://localhost:4317"
 	}
 
 	println("Using OpenTelemetry Collector endpoint:", collectorURL)
 
-	traceExporter, err := otlptracegrpc.New(ctx)
+	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithInsecure())
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create trace exporter: %w", err)
 	}
 
-	metricExporter, err := otlpmetricgrpc.New(ctx)
+	metricExporter, err := otlpmetricgrpc.New(ctx, otlpmetricgrpc.WithInsecure())
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create metric exporter: %w", err)
 	}
 
 	res := resource.NewWithAttributes(
 		semconv.SchemaURL,
-		semconv.ServiceNameKey.String("otel-go-tracer"),
+		semconv.ServiceNameKey.String("emitter-go"),
 		semconv.ServiceVersionKey.String("1.0.0"),
 		semconv.ServiceInstanceIDKey.String(generateInstanceID()),
 	)
@@ -72,7 +72,6 @@ func setupOpenTelemetry(ctx context.Context) (*sdktrace.TracerProvider, *sdkmetr
 	return tracerProvider, meterProvider, nil
 }
 
-// Erzeugt eine zufällige Trace
 func generateRandomTrace(tracer trace.Tracer) {
 	ctx, span := tracer.Start(context.Background(), "random-trace")
 	defer span.End()

@@ -28,8 +28,8 @@ const metricExporter = new OTLPMetricExporter({
 
 const sdk = new NodeSDK({
     resource: new Resource({
-        [ATTR_SERVICE_NAME]: 'opentelemetry-trace-emitter',
-        [ATTR_SERVICE_VERSION]: '1.0.1',
+        [ATTR_SERVICE_NAME]: 'emitter-javascript',
+        [ATTR_SERVICE_VERSION]: '1.0.2',
         [ATTR_NETWORK_PEER_ADDRESS]: 'localhost',
         [ATTR_NETWORK_PEER_PORT]: 8080,
         [ATTR_NETWORK_PROTOCOL_NAME]: 'http',
