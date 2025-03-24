@@ -17,7 +17,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   aspire:
-    image: mcr.microsoft.com/dotnet/aspire-dashboard:8.0.0
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:8.2.1
     container_name: otel-receiver-aspire
     ports:
       - 18888:18888
