@@ -113,6 +113,9 @@ func generateRandomLog(ctx context.Context) {
 	logrus.WithContext(ctx).WithFields(logrus.Fields{
 		"dd.trace_id": traceID,
 		"dd.span_id":  spanID,
+		"env":         "production",
+		"service":     "emitter-go",
+		"version":     "1.0.0",
 	}).Info(message)
 }
 

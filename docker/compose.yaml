@@ -3,6 +3,7 @@ name: 'opentelemetry-emitter'
 services:
   collector:
     image: otel/opentelemetry-collector-contrib:latest
+    user: '${UID}:${GID}'
     container_name: otel-collector-contrib
     command: ['--config=/etc/otelcol/config.yaml']
     privileged: true
@@ -13,7 +14,7 @@ services:
       - '4318:4318' # OTLP receiver over HTTP
     volumes:
       - ./config/collector-contrib-config.yaml:/etc/otelcol/config.yaml
-      - ./logs/collector-contrib.json:/logs/collector.json
+      - ~/Library/Logs/:/var/log/macos
       - /var/run/docker.sock:/var/run/docker.sock
 
   aspire:

@@ -8,6 +8,18 @@ receivers:
         endpoint: 0.0.0.0:4317
       http:
         endpoint: 0.0.0.0:4318
+  filelog:
+    include:
+      - /var/log/macos/*/*/*.log
+    start_at: end
+    include_file_path: true
+    include_file_name: true
+    operators:
+      - type: regex_parser
+        regex: '^(?P<timestamp>\S+) (?P<level>\S+) (?P<message>.*)$'
+        timestamp:
+          parse_from: attributes.timestamp
+          layout: '%Y-%m-%dT%H:%M:%S.%fZ'
   hostmetrics:
     collection_interval: 10s
     scrapers:
@@ -75,11 +87,11 @@ extensions:
 service:
   pipelines:
     metrics:
-      receivers: [otlp, hostmetrics, datadog/connector] # docker_stats
+      receivers: [otlp, hostmetrics, datadog/connector]
       processors: [cumulativetodelta, batch, resourcedetection]
       exporters: [debug, otlp/aspire, datadog]
     logs:
-      receivers: [otlp]
+      receivers: [otlp, filelog]
       processors: [batch]
       exporters: [debug, otlp/aspire, datadog]
     traces:
