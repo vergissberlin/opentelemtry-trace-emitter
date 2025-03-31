@@ -15,4 +15,4 @@ ENV OTEL_COLLECTOR_ENDPOINT=http://localhost:4318/v1/traces \
     SPAN_COUNT_MAX=12 \
     DEBUG=true
 
-CMD ["node", "index.mjs"]
+CMD ["node", "index.js"]

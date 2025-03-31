@@ -117,6 +117,7 @@ func generateRandomLog(ctx context.Context) {
 		"service":     "emitter-go",
 		"version":     "1.0.0",
 	}).Info(message)
+	log.Println(message)
 }
 
 func newResource() (*resource.Resource, error) {
@@ -152,6 +153,20 @@ func main() {
 
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.AddHook(&dd_logrus.DDContextLogHook{})
+
+	// Datei erstellen oder öffnen
+	file, err := os.OpenFile("logs/app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("Fehler beim Öffnen der Datei: %v", err)
+	}
+	defer file.Close()
+
+	// Log-Ausgabe in die Datei umleiten
+	log.SetOutput(file)
+
+	// Test-Logs
+	log.Println("Dies ist eine normale Log-Nachricht")
+	log.Println("Noch eine Log-Nachricht")
 
 	if err != nil {
 		log.Fatalf("Failed to create resource: %v", err)

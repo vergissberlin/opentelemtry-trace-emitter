@@ -11,6 +11,7 @@ receivers:
   filelog:
     include:
       - /var/log/macos/*/*/*.log
+      - /var/log/go/*.log
     start_at: end
     include_file_path: true
     include_file_name: true
@@ -44,6 +45,23 @@ receivers:
 # Processors
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 processors:
+  resource:
+    attributes:
+      - key: host.name
+        action: insert
+        from_attribute: host.name
+      - key: edeka.host.name
+        action: upsert
+        from_attribute: host.name
+      - key: edeka.host.ip
+        action: upsert
+        from_attribute: host.ip
+      - key: edeka.host.os
+        action: upsert
+        from_attribute: host.os
+      - key: edeka.host.arch
+        action: upsert
+        from_attribute: host.arch
   batch:
     timeout: 12s
     send_batch_max_size: 1000
@@ -92,7 +110,7 @@ service:
       exporters: [debug, otlp/aspire, datadog]
     logs:
       receivers: [otlp, filelog]
-      processors: [batch]
+      processors: [batch, resource]
       exporters: [debug, otlp/aspire, datadog]
     traces:
       receivers: [otlp]

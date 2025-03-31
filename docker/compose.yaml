@@ -15,6 +15,7 @@ services:
     volumes:
       - ./config/collector-contrib-config.yaml:/etc/otelcol/config.yaml
       - ~/Library/Logs/:/var/log/macos
+      - ../app/go/logs/:/var/log/go
       - /var/run/docker.sock:/var/run/docker.sock
 
   aspire:
