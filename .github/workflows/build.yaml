@@ -32,10 +32,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: app/javascript
-          target: production
-          build-args: |
-            NODE_ENV=production
-            NODE_OPTIONS=--max_old_space_size=4096
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/opentelemetry-trace-emitter:javascript
           platforms: linux/amd64,linux/arm64
