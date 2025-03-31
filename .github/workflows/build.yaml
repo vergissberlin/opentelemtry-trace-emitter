@@ -31,7 +31,7 @@ jobs:
       - name: Build and push JavaScript Docker image to GHCR
         uses: docker/build-push-action@v5
         with:
-          context: app/js
+          context: app/javascript
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/opentelemetry-trace-emitter:javascript
           platforms: linux/amd64,linux/arm64
