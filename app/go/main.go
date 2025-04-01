@@ -8,6 +8,7 @@ import (
 	"log"
 	mathRand "math/rand" // Alias für math/rand, um Konflikte mit crypto/rand zu vermeiden
 	"os"
+	"path/filepath"
 	"time"
 
 	dd_logrus "github.com/DataDog/dd-trace-go/contrib/sirupsen/logrus/v2"
@@ -84,6 +85,28 @@ func setupOpenTelemetry(ctx context.Context) (*sdktrace.TracerProvider, *sdkmetr
 	return tracerProvider, meterProvider, nil
 }
 
+func setupFileLogger() (*os.File, error) {
+	logDir := "logs"
+	logFile := filepath.Join(logDir, "app.log")
+
+	// Ensure the logs directory exists
+	if err := os.MkdirAll(logDir, 0755); err != nil {
+		return nil, fmt.Errorf("failed to create log directory: %w", err)
+	}
+
+	// Open the log file
+	file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open log file: %w", err)
+	}
+
+	// Set logrus output to the file
+	logrus.SetOutput(file)
+
+	// Return the file for deferred closing
+	return file, nil
+}
+
 func generateRandomTrace(tracer trace.Tracer) {
 	ctx, span := tracer.Start(context.Background(), "random-trace")
 	defer span.End()
@@ -154,19 +177,15 @@ func main() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.AddHook(&dd_logrus.DDContextLogHook{})
 
-	// Datei erstellen oder öffnen
-	file, err := os.OpenFile("logs/app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	// Setup file logger
+	logFile, err := setupFileLogger()
 	if err != nil {
-		log.Fatalf("Fehler beim Öffnen der Datei: %v", err)
+		log.Fatalf("Failed to setup file logger: %v", err)
 	}
-	defer file.Close()
+	defer logFile.Close()
 
-	// Log-Ausgabe in die Datei umleiten
-	log.SetOutput(file)
-
-	// Test-Logs
-	log.Println("Dies ist eine normale Log-Nachricht")
-	log.Println("Noch eine Log-Nachricht")
+	// Redirect standard log output to the same file
+	log.SetOutput(logFile)
 
 	if err != nil {
 		log.Fatalf("Failed to create resource: %v", err)
