@@ -3,6 +3,9 @@
     "version": "1.0.0",
     "main": "index.js",
     "description": "OpenTelemetry Trace Emitter Example",
+    "license": "MIT",
+    "private": true,
+    "type": "module",
     "scripts": {
         "start": "node index.js"
     },
