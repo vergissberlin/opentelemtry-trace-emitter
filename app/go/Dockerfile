@@ -1,6 +1,5 @@
 FROM golang AS builder
 
-
 WORKDIR /app
 
 COPY go.mod go.sum ./
