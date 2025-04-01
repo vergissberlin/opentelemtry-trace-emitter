@@ -3,7 +3,8 @@ import {getNodeAutoInstrumentations} from '@opentelemetry/auto-instrumentations-
 import {OTLPMetricExporter} from '@opentelemetry/exporter-metrics-otlp-proto'
 import {PeriodicExportingMetricReader} from '@opentelemetry/sdk-metrics'
 import {CollectorTraceExporter} from '@opentelemetry/exporter-collector-grpc'
-import {Resource} from '@opentelemetry/resources'
+import pkg from '@opentelemetry/resources'
+const {Resource} = pkg
 import {
     ATTR_SERVICE_NAME,
     ATTR_SERVICE_VERSION,
