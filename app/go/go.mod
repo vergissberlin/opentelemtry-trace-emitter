@@ -6,11 +6,11 @@ require (
 	github.com/DataDog/dd-trace-go/contrib/sirupsen/logrus/v2 v2.1.0-dev
 	github.com/sirupsen/logrus v1.9.3
 	go.opentelemetry.io/otel v1.37.0
-	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.11.0
+	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.13.0
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.37.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.37.0
 	go.opentelemetry.io/otel/sdk v1.37.0
-	go.opentelemetry.io/otel/sdk/log v0.11.0
+	go.opentelemetry.io/otel/sdk/log v0.13.0
 	go.opentelemetry.io/otel/sdk/metric v1.37.0
 	go.opentelemetry.io/otel/trace v1.37.0
 )
@@ -79,7 +79,7 @@ require (
 	go.opentelemetry.io/collector/semconv v0.120.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp v0.11.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.37.0 // indirect
-	go.opentelemetry.io/otel/log v0.11.0 // indirect
+	go.opentelemetry.io/otel/log v0.13.0 // indirect
 	go.opentelemetry.io/otel/metric v1.37.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.7.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
