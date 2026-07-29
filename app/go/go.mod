@@ -4,7 +4,7 @@ go 1.23.6
 
 require (
 	github.com/DataDog/dd-trace-go/contrib/sirupsen/logrus/v2 v2.1.0-dev
-	github.com/sirupsen/logrus v1.9.3
+	github.com/sirupsen/logrus v1.9.4
 	go.opentelemetry.io/otel v1.37.0
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.11.0
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.37.0
